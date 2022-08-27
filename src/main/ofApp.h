@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "Map.h"
 
 class ofApp : public ofBaseApp{
 	public:
@@ -20,5 +21,5 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 
 	private:
-		
+		Map* map = new Map(30,30,20);
 };

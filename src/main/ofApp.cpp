@@ -7,13 +7,14 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-   
+   map->tick();
    
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-   
+   ofDrawBitmapString(ofToString(ofGetWidth()) + " " + ofToString(ofGetHeight()), 20, 20);
+   map->render();
 }
 
 //--------------------------------------------------------------
