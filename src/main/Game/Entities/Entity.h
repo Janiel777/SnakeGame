@@ -16,6 +16,9 @@ class Entity{
         int getH(){return y;}
         void setX(int num){x = num;}
         void setY(int num){y = num;}
+        ofRectangle getBounds(){return ofRectangle(x,y,w,h);}
+
+        bool remove = false;
         
 };
 

@@ -20,7 +20,9 @@
 			"initializer_list": "cpp",
 			"ranges": "cpp",
 			"regex": "cpp",
-			"valarray": "cpp"
+			"valarray": "cpp",
+			"numbers": "cpp",
+			"new": "cpp"
 		}
 	}
 }

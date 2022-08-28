@@ -4,10 +4,11 @@ Map::Map(int w, int h, int squaresLength){
     this->w = w;
     this->h = h;
     this->squaresLength = squaresLength;
-
+    em = new EntityManager();
+    
 
     if(w % 2 == 0){
-        x = ofGetWidth()/2 - w/2*squaresLength;//The squeare are 10 * 10 pixels
+        x = ofGetWidth()/2 - w/2*squaresLength;
     }else{
         x = ofGetWidth()/2 - int(w/2)*squaresLength - squaresLength/2;
     }
@@ -24,18 +25,20 @@ Map::Map(int w, int h, int squaresLength){
             matrix[i].push_back(0);
             if(i == 0 || j == 0 || i == h-1 || j == w-1){
                 matrix[i][j] = 1;
-                bounds.push_back(new Bound(x + squaresLength * j, y + squaresLength * i, squaresLength, squaresLength));
+                em->bounds.push_back(new Bound(x + squaresLength * j, y + squaresLength * i, squaresLength, squaresLength));
             }
         } 
     }
+
+    
+    fruitSpawner = new FruitSpawner(em, x, y, w, h, squaresLength);
+    em->snake = new Snake(x + int(w/2) * squaresLength, y + int(h/2) * squaresLength, squaresLength, squaresLength);
     
 }
 
 void Map::render(){
 
-    for(Entity* b : bounds){
-        b->render();
-    }
+    em->render();
 
 
     ofNoFill();
@@ -47,7 +50,6 @@ void Map::render(){
         }
     }
 
-    
 }
 
 void Map::tick(){
@@ -68,29 +70,53 @@ void Map::tick(){
             y = ofGetHeight()/2 - int(y/2)*squaresLength - squaresLength/2;
         }
 
-        for(Entity* b : bounds){
+        for(Bound* e : em->bounds){
             bool founded = false;
 
             for(int i = 0; i < h; i++){
                 for(int j = 0; j < w; j++){
-                    if(i == 0 || j == 0 || i == h-1 || j == w-1){
-                        if(b->getX() == oldX + squaresLength * j && b->getY() == oldY + squaresLength * i){
-                            b->setX(x + squaresLength * j);
-                            b->setY(y + squaresLength * i);
+                        if(e->getX() == oldX + squaresLength * j && e->getY() == oldY + squaresLength * i){
+                            e->setX(x + squaresLength * j);
+                            e->setY(y + squaresLength * i);
                             founded = true;
                         }
-                    }
                     if(founded) break;
                 } 
                 if(founded) break;
             }
-            
+        }
+
+        for(Fruit* f : em->fruits){
+            bool founded = false;
+
+            for(int i = 0; i < h; i++){
+                for(int j = 0; j < w; j++){
+                      if(f->getX() == oldX + squaresLength * j && f->getY() == oldY + squaresLength * i){
+                            f->setX(x + squaresLength * j);
+                            f->setY(y + squaresLength * i);
+                      }   
+                      if(founded) break;       
+                }
+                if(founded) break;
+            }
+                
         }
 
 
         windowW = ofGetWidth();
         windowH = ofGetHeight();
     }
-
     
+    em->tick();
+    fruitSpawner->tick();
+    
+}
+
+void Map::keyPressed(int key){
+    em->keyPressed(key);
+}
+
+Map::~Map(){
+    delete em;
+    delete fruitSpawner;
 }

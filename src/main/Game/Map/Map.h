@@ -1,7 +1,9 @@
 #pragma once
 #include "ofMain.h"
 #include "Entity.h"
-#include "Bound.h"
+#include "Snake.h"
+#include "EntityManager.h"
+#include "FruitSpawner.h"
 
 
 class Map{
@@ -11,11 +13,14 @@ class Map{
         int windowW = ofGetWidth();
         int windowH = ofGetHeight();
         vector<vector<int>> matrix;
-        vector<Entity*> bounds;
+        EntityManager* em;
+        FruitSpawner* fruitSpawner;
     public:
         Map(int w, int h, int squaresLength);
+        ~Map();
         void render();
         void tick();
+        void keyPressed(int key);
         
 };
 
