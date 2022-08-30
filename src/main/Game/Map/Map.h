@@ -18,6 +18,8 @@ class Map{
     public:
         Map(int w, int h, int squaresLength);
         ~Map();
+        void updateEntitiesCoordinates();
+        void drawGrid();
         void render();
         void tick();
         void keyPressed(int key);

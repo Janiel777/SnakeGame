@@ -26,13 +26,10 @@ void EntityManager::tick(){
 
     toRemove.clear();
 
-    if(!snake->remove){
-        snake->tick();
-    }else{
-        delete snake;
-    }
-
+    snake->tick();
+    
     checkCollisions();
+    
 }
 
 void EntityManager::render(){

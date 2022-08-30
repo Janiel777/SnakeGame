@@ -16,7 +16,7 @@ void FruitSpawner::tick(){
 }
 
 void FruitSpawner::spawnFruit(){
-    em->fruits.push_back(new Fruit(mapX + int(ofRandom(1,mapW))*squareLength, mapY + int(ofRandom(1,mapH))*squareLength, squareLength, squareLength));
+    em->fruits.push_back(new Fruit(mapX + int(ofRandom(1,mapW-1))*squareLength, mapY + int(ofRandom(1,mapH-1))*squareLength, squareLength, squareLength));
 }
 
 FruitSpawner::~FruitSpawner(){

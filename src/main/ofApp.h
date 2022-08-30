@@ -21,5 +21,5 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 
 	private:
-		Map* map = new Map(120,120,5);
+		Map* map = new Map(60,60,10);
 };
