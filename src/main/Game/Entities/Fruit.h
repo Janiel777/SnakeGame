@@ -7,6 +7,7 @@ class Fruit : public Entity{
         
     public:
         Fruit(int x, int y, int w, int h);
+        ~Fruit();
         void render();
         void tick();
         

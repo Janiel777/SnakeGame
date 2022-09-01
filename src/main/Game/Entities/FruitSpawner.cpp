@@ -10,7 +10,7 @@ FruitSpawner::FruitSpawner(EntityManager* em, int mapX, int mapY, int mapW, int 
 }
 
 void FruitSpawner::tick(){
-    if(em->fruits.size() < 20){
+    if(em->fruits.size() < numOfFruits){
         spawnFruit();
     }
 }
@@ -20,5 +20,5 @@ void FruitSpawner::spawnFruit(){
 }
 
 FruitSpawner::~FruitSpawner(){
-    
+    delete em;
 }

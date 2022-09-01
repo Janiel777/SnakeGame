@@ -10,10 +10,17 @@ private:
     int squareLength;
     int mapW;
     int mapH;
+    int numOfFruits = 20;
 public:
     FruitSpawner(EntityManager* em, int mapX, int mapY, int mapW, int mapH, int squareLength);
     void tick();
     void spawnFruit();
+    void setMapX(int num) {mapX = num;}
+    void setMapY(int num) {mapY = num;}
+    void setMapW(int num) {mapW = num;}
+    void setMapH(int num) {mapH = num;}
+    int getNumOfFruits(){return numOfFruits;}
+    void setNumOfFruits(int num) {numOfFruits = num;}
     ~FruitSpawner();
 };
 

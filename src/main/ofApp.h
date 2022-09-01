@@ -23,3 +23,6 @@ class ofApp : public ofBaseApp{
 	private:
 		Map* map = new Map(60,60,10);
 };
+
+
+

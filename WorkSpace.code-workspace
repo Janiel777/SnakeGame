@@ -22,7 +22,10 @@
 			"regex": "cpp",
 			"valarray": "cpp",
 			"numbers": "cpp",
-			"new": "cpp"
+			"new": "cpp",
+			"memory": "cpp",
+			"random": "cpp",
+			"optional": "cpp"
 		}
 	}
 }

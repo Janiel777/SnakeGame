@@ -6,3 +6,7 @@ Entity::Entity(int x, int y, int w, int h){
     this->w = w;
     this->h = h;
 }
+
+Entity::~Entity(){
+    
+}

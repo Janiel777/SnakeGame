@@ -13,3 +13,7 @@ void Bound::render(){
 void Bound::tick(){
     
 }
+
+Bound::~Bound(){
+    
+}

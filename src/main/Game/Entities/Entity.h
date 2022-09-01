@@ -8,6 +8,7 @@ class Entity{
 
     public:
         Entity(int x, int y, int w, int h);
+        ~Entity();
         virtual void render(){ofDrawRectangle(x,y,w,h);}
         virtual void tick(){}
         int getX(){return x;}

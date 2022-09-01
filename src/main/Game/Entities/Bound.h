@@ -7,6 +7,7 @@ class Bound : public Entity{
         
     public:
         Bound(int x, int y, int w, int h);
+        ~Bound();
         void render();
         void tick();
         

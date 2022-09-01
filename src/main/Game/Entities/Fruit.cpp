@@ -13,3 +13,7 @@ void Fruit::render(){
 void Fruit::tick(){
     
 }
+
+Fruit::~Fruit(){
+    
+}

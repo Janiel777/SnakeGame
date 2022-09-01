@@ -2,12 +2,7 @@
 
 
 void EntityManager::tick(){
-    
-
-    for(Bound* b : bounds){
-        b->tick();
-    }
-
+    checkCollisions();
     vector<int> toRemove;
 
     for(int i = 0; i < fruits.size(); i++){
@@ -28,7 +23,7 @@ void EntityManager::tick(){
 
     snake->tick();
     
-    checkCollisions();
+    
     
 }
 
@@ -60,8 +55,18 @@ void EntityManager::checkCollisions(){
     }
 
     for(int i = 2; i < snake->body.size(); i++){
-        if(snake->getBounds().intersects(snake->body[i])){
+        if(snake->getBounds().intersects(*snake->body[i])){
             snake->remove = true;
+        }
+    }
+
+    for(Fruit* f: fruits){
+        for(Bound* b : bounds){
+            if(f->getBounds().intersects(b->getBounds())){
+                f->remove = true;
+                break;
+            }
+            
         }
     }
 }

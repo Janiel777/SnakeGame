@@ -8,11 +8,13 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
    map->tick();
+   map->mouseTracking(mouseX,mouseY);
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
    map->render();
+   // ofDrawBitmapString(ofToString(mouseX) + " " + ofToString(mouseY), 20, 20);
 }
 
 //--------------------------------------------------------------
@@ -37,7 +39,7 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-
+   map->mousePressed(x,y,button);
 }
 
 //--------------------------------------------------------------

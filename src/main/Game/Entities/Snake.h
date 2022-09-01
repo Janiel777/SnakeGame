@@ -18,13 +18,17 @@ class Snake : public Entity{
         
         MOVING moving = RIGHT;
         int counter = 0;
+        int speed = 6;
     public:
-        vector<ofRectangle> body;
+        vector<ofRectangle*> body;
         Snake(int x, int y, int w, int h);
         ~Snake();
         void render();
         void tick();
         void keyPressed(int key);
         void increaseSize();
+        void updateCoordinates(int oldMapX, int oldMapY, int mapX, int mapY);
+        int getSpeed(){return speed;}
+        void setSpeed(int num){speed = num; counter = 0;}
         
 };
