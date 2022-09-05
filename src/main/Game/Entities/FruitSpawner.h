@@ -5,6 +5,7 @@
 class FruitSpawner{
 private:
     EntityManager* em;
+    vector<vector<int>>* matrix;
     int mapX;
     int mapY;
     int squareLength;
@@ -12,7 +13,7 @@ private:
     int mapH;
     int numOfFruits = 20;
 public:
-    FruitSpawner(EntityManager* em, int mapX, int mapY, int mapW, int mapH, int squareLength);
+    FruitSpawner(EntityManager* em, int mapX, int mapY, int mapW, int mapH, int squareLength, vector<vector<int>>* matrix);
     void tick();
     void spawnFruit();
     void setMapX(int num) {mapX = num;}

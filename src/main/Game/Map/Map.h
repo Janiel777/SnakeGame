@@ -15,7 +15,7 @@ class Map{
         int windowW = ofGetWidth();
         int windowH = ofGetHeight();
         bool showHud = false;
-        vector<vector<int>> matrix;
+        vector<vector<int>>* matrix;
         EntityManager* em;
         FruitSpawner* fruitSpawner;
 
@@ -46,8 +46,9 @@ class Map{
         void mouseTracking(int x, int y);
         void reset();
         void changeMapDimensions();
-        void deleteFruits();
-        void deleteBounds();
+        void drawMatrix();
+        void setFruitInMatrix();
+        void setSnakeInMatrix();
 
         
 };

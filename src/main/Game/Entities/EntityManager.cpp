@@ -3,28 +3,8 @@
 
 void EntityManager::tick(){
     checkCollisions();
-    vector<int> toRemove;
-
-    for(int i = 0; i < fruits.size(); i++){
-        if(!fruits[i]->remove){
-            fruits[i]->tick();
-        }else{
-            toRemove.push_back(i);
-        }
-    }
-
-    for(unsigned int removable: toRemove){
-        Entity* entityPointer = *(fruits.begin() + removable);
-        fruits.erase(fruits.begin() + removable);
-        delete entityPointer;
-    }
-
-    toRemove.clear();
-
     snake->tick();
-    
-    
-    
+
 }
 
 void EntityManager::render(){
@@ -40,6 +20,46 @@ void EntityManager::keyPressed(int key){
     snake->keyPressed(key);
 }
 
+/**
+ * @brief This method removes the fruit from the parameter of the fruit vector
+ * 
+ * @param f The fruit to remove
+ */
+void EntityManager::deleteDruit(Fruit* f){
+    fruits.erase(find(fruits.begin(), fruits.end(), f));
+    delete f;
+}
+
+void EntityManager::spawNewSnake(int mapX, int mapY, int mapW, int mapH, int squaresLength){
+    for(int i = 0; i < snake->body.size(); i++){
+        if((*matrix)[(snake->body[i]->getY() - mapY) / squaresLength][(snake->body[i]->getX() - mapX) / squaresLength] == 1) continue;
+        (*matrix)[(snake->body[i]->getY() - mapY) / squaresLength][(snake->body[i]->getX() - mapX) / squaresLength] = 0;
+    }
+    delete snake;
+    snake = new Snake(mapX + int(mapW/2) * squaresLength, mapY + int(mapH/2) * squaresLength, squaresLength, squaresLength);
+}
+
+/**
+ * @brief 
+ * 
+ */
+void EntityManager::deleteFruits(int mapX, int mapY, int mapW, int mapH, int squaresLength){
+    vector<Fruit*>::iterator it = fruits.begin();
+    while(it != fruits.end()){
+        (*matrix)[((*it)->getY() - mapY) / squaresLength][((*it)->getX() - mapX) / squaresLength] = 0;
+        fruits.erase(it);
+        delete *it;
+    } 
+}
+
+void EntityManager::deleteBounds(){
+    vector<Bound*>::iterator it = bounds.begin();
+    while(it != bounds.end()){
+        bounds.erase(it);
+        delete *it;
+    } 
+}
+
 void EntityManager::checkCollisions(){
     for(Bound* b: bounds){
         if(snake->getBounds().intersects(b->getBounds())){
@@ -49,8 +69,9 @@ void EntityManager::checkCollisions(){
 
     for(Fruit* f: fruits){
         if(snake->getBounds().intersects(f->getBounds())){
-            f->remove = true;
+            deleteDruit(f);
             snake->increaseSize();
+            break;
         }
     }
 

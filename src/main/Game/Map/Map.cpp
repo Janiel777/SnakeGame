@@ -5,6 +5,8 @@ Map::Map(int w, int h, int squaresLength){
     this->h = h;
     this->squaresLength = squaresLength;
     em = new EntityManager();
+    matrix = new vector<vector<int>>();
+    em->matrix = matrix;
 
     plusSign.load("images/plusSign.png");
     minusSign.load("images/minusSign.png");
@@ -39,31 +41,37 @@ Map::Map(int w, int h, int squaresLength){
     }
 
     for(int i = 0; i < h; i++){
-        matrix.push_back(vector<int>());
+        matrix->push_back(vector<int>());
         for(int j = 0; j < w; j++){
-            matrix[i].push_back(0);
+            (*matrix)[i].push_back(0);
             if(i == 0 || j == 0 || i == h-1 || j == w-1){
-                matrix[i][j] = 1;
+                (*matrix)[i][j] = 1;
                 em->bounds.push_back(new Bound(x + squaresLength * j, y + squaresLength * i, squaresLength, squaresLength));
             }
         } 
     }
 
     
-    fruitSpawner = new FruitSpawner(em, x, y, w, h, squaresLength);
+    fruitSpawner = new FruitSpawner(em, x, y, w, h, squaresLength, matrix);
     em->snake = new Snake(x + int(w/2) * squaresLength, y + int(h/2) * squaresLength, squaresLength, squaresLength);
     
 }
 
 void Map::tick(){
     if(ofGetWidth() != windowW || ofGetHeight() != windowH) updateEntitiesCoordinates();
-    
+
+    //calculacion de la ruta
+    //cambiamos la cola a 0 (lugar vacio en la matrix)
+    //luego se mueve la culebra
+    //setiamos la culebra en la matrix
+    (*matrix)[(em->snake->body[em->snake->body.size()-1]->getY() - y) / squaresLength][(em->snake->body[em->snake->body.size()-1]->getX() - x) / squaresLength] = 0;
     em->tick();
-    if(em->snake->remove){
-        delete em->snake;
-        em->snake = new Snake(x + int(w/2) * squaresLength, y + int(h/2) * squaresLength, squaresLength, squaresLength);
-    } 
+    setSnakeInMatrix();
+    setFruitInMatrix();
     fruitSpawner->tick();
+    
+    
+    if(em->snake->remove)em->spawNewSnake(x,y,w,h,squaresLength);
 
     if(showHud){
         increasWidthButton->tick();
@@ -80,12 +88,12 @@ void Map::tick(){
         } 
         if(increaseFuitsButton->wasPressed() && fruitSpawner->getNumOfFruits() <= 19){
             fruitSpawner->setNumOfFruits(fruitSpawner->getNumOfFruits()+1);
-            deleteFruits();
+            em->deleteFruits(x,y,w,h,squaresLength);
             increaseFuitsButton->reset();
         } 
         if(decreaseFuitsButton->wasPressed() && fruitSpawner->getNumOfFruits() >=1){
             fruitSpawner->setNumOfFruits(fruitSpawner->getNumOfFruits()-1);
-            deleteFruits();
+            em->deleteFruits(x,y,w,h,squaresLength);
             decreaseFuitsButton->reset();
         } 
         if(increasSnakeSpeedButton->wasPressed() && em->snake->getSpeed() >= 2){
@@ -102,40 +110,39 @@ void Map::tick(){
 }
 
 void Map::render(){
-
     em->render();
     drawGrid();
     if(showHud) drawHud();
-
-
+    drawMatrix();
 }
 
+/**
+ *  This method is called when one of the buttons that changes
+ *  the size of the map is pressed. Mainly what it does is call
+ *  the updateEntitiesCoordinates method so that everything is centralized again.
+ */
 void Map::changeMapDimensions(){
 
-    
-    deleteBounds();
-    deleteFruits();
-
+    em->deleteBounds();
+    em->deleteFruits(x,y,w,h,squaresLength);
 
     if(increasWidthButton->wasPressed()) w++;
     if(decreaseWidthButton->wasPressed()) w--;
     if(increasHeightButton->wasPressed())h++;
     if(decreaseHeightButton->wasPressed()) h--;
 
-
-
-    matrix.clear();
+    (*matrix).clear();
     for(int i = 0; i < h; i++){
-        matrix.push_back(vector<int>());
+        (*matrix).push_back(vector<int>());
         for(int j = 0; j < w; j++){
-            matrix[i].push_back(0);
+            (*matrix)[i].push_back(0);
             if(i == 0 || j == 0 || i == h-1 || j == w-1){
-                matrix[i][j] = 1;
+                (*matrix)[i][j] = 1;
                 em->bounds.push_back(new Bound(x + squaresLength * j, y + squaresLength * i, squaresLength, squaresLength));
             }
         } 
     }
-    
+
     updateEntitiesCoordinates();
     increasWidthButton->reset();
     decreaseWidthButton->reset();
@@ -149,26 +156,6 @@ void Map::changeMapDimensions(){
 
 
 }
-
-void Map::deleteFruits(){
-    vector<Fruit*>::iterator ite = em->fruits.begin();
-    while(ite != em->fruits.end()){
-        Entity* entityPointer = *ite;
-        em->fruits.erase(ite);
-        delete entityPointer;
-    } 
-}
-
-void Map::deleteBounds(){
-    vector<Bound*>::iterator it = em->bounds.begin();
-    while(it != em->bounds.end()){
-        Entity* entityPointer = *it;
-        em->bounds.erase(it);
-        delete entityPointer;
-    } 
-}
-
-
 
 
 void Map::keyPressed(int key){
@@ -188,7 +175,15 @@ void Map::mousePressed(int x, int y, int button){
         decreaseSnakeSpeedButton->mousePressed(x,y);
     }
 }
-
+/**
+ * @brief This method is used to know the position of the mouse.
+ *  Specifically it is used to know when the mouse is over a 
+ * button so that it grows a little and lets the user know intuitively
+ *  that it can be pressed.
+ * 
+ * @param x Mouse x-coordinate
+ * @param y Mouse y-coordinate
+ */
 void Map::mouseTracking(int x, int y){
     if(showHud){
         increasWidthButton->mouseTracking(x,y);
@@ -206,7 +201,10 @@ void Map::mouseTracking(int x, int y){
 void Map::reset(){
     
 }
-
+/**
+ * Here the grid lines are drawn.
+ * 
+ */
 void Map::drawGrid(){
     ofNoFill();
     ofSetLineWidth(1);
@@ -218,6 +216,34 @@ void Map::drawGrid(){
     }
 }
 
+void Map::drawMatrix(){
+    ofSetColor(0,0,0);
+    for(int row = 0; row < (*matrix).size(); row++){
+        for(int column = 0; column < (*matrix)[row].size(); column++){
+            ofDrawBitmapString(ofToString((*matrix)[row][column]), x + column * squaresLength, y + row * squaresLength + squaresLength);
+        }
+    }
+    ofDrawBitmapString(ofToString((*matrix).size()), 20,20);
+}
+
+void Map::setFruitInMatrix(){
+    for(Fruit* f: em->fruits){
+        (*matrix)[(f->getY() - y) / squaresLength][(f->getX() - x) / squaresLength] = 2;
+    }
+}
+
+void Map::setSnakeInMatrix(){
+    for(ofRectangle* r: em->snake->body){
+        if((*matrix)[(r->getY() - y) / squaresLength][(r->getX() - x) / squaresLength] == 1) continue;
+        (*matrix)[(r->getY() - y) / squaresLength][(r->getX() - x) / squaresLength] = 3;
+    }
+}
+
+/**
+ * Here the buttons and their
+ * respective texts are drawn
+ * 
+ */
 void Map::drawHud(){
     ofSetColor(255,255,255);
     int stringWidth = font.stringWidth("Map Width      Map Height      Number of Fruits      Snake Speed");
@@ -234,6 +260,16 @@ void Map::drawHud(){
     }
 }
 
+
+/**
+ * This method calculates the new coordinates
+ * by changing the size of the openFramesWorks window. 
+ * Change the coordinates of: 
+ * all bounds, 
+ * all the fruits, 
+ * the snake and its body,
+ * and all the buttons.
+ */
 void Map::updateEntitiesCoordinates(){
     int oldX = x;
     int oldY = y;
