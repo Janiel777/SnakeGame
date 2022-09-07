@@ -59,19 +59,20 @@ Map::Map(int w, int h, int squaresLength){
 
 void Map::tick(){
     if(ofGetWidth() != windowW || ofGetHeight() != windowH) updateEntitiesCoordinates();
-
+    if(em->snake->remove)em->spawNewSnake(x,y,w,h,squaresLength);
     //calculacion de la ruta
     //cambiamos la cola a 0 (lugar vacio en la matrix)
     //luego se mueve la culebra
     //setiamos la culebra en la matrix
     (*matrix)[(em->snake->body[em->snake->body.size()-1]->getY() - y) / squaresLength][(em->snake->body[em->snake->body.size()-1]->getX() - x) / squaresLength] = 0;
     em->tick();
+
     setSnakeInMatrix();
     setFruitInMatrix();
     fruitSpawner->tick();
     
     
-    if(em->snake->remove)em->spawNewSnake(x,y,w,h,squaresLength);
+    
 
     if(showHud){
         increasWidthButton->tick();
@@ -233,9 +234,11 @@ void Map::setFruitInMatrix(){
 }
 
 void Map::setSnakeInMatrix(){
-    for(ofRectangle* r: em->snake->body){
-        if((*matrix)[(r->getY() - y) / squaresLength][(r->getX() - x) / squaresLength] == 1) continue;
-        (*matrix)[(r->getY() - y) / squaresLength][(r->getX() - x) / squaresLength] = 3;
+    if((*matrix)[(em->snake->body[0]->getY() - y) / squaresLength][(em->snake->body[0]->getX() - x) / squaresLength] != 1){
+        (*matrix)[(em->snake->body[0]->getY() - y) / squaresLength][(em->snake->body[0]->getX() - x) / squaresLength] = 3;
+    }
+    for(int i = 1; i < em->snake->body.size(); i++){
+        (*matrix)[(em->snake->body[i]->getY() - y) / squaresLength][(em->snake->body[i]->getX() - x) / squaresLength] = 3;
     }
 }
 

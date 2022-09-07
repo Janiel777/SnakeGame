@@ -2,8 +2,8 @@
 
 
 void EntityManager::tick(){
-    checkCollisions();
     snake->tick();
+    checkCollisions();
 
 }
 
@@ -31,8 +31,8 @@ void EntityManager::deleteDruit(Fruit* f){
 }
 
 void EntityManager::spawNewSnake(int mapX, int mapY, int mapW, int mapH, int squaresLength){
-    for(int i = 0; i < snake->body.size(); i++){
-        if((*matrix)[(snake->body[i]->getY() - mapY) / squaresLength][(snake->body[i]->getX() - mapX) / squaresLength] == 1) continue;
+    for(int i = 1; i < snake->body.size(); i++){
+        // if((*matrix)[(snake->body[i]->getY() - mapY) / squaresLength][(snake->body[i]->getX() - mapX) / squaresLength] == 1) continue;
         (*matrix)[(snake->body[i]->getY() - mapY) / squaresLength][(snake->body[i]->getX() - mapX) / squaresLength] = 0;
     }
     delete snake;
