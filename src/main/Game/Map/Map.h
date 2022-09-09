@@ -5,7 +5,7 @@
 #include "EntityManager.h"
 #include "FruitSpawner.h"
 #include "Button.h"
-
+#include <list>
 
 
 class Map{
@@ -14,9 +14,18 @@ class Map{
         int squaresLength;
         int windowW = ofGetWidth();
         int windowH = ofGetHeight();
+
         bool showHud = false;
+        bool searching = false;
+
         vector<vector<int>>* matrix;
+        vector<vector<int>>* matrixCopy;
+
+        list<list<int>> path;
+        list<list<int>> paths;
+    
         EntityManager* em;
+
         FruitSpawner* fruitSpawner;
 
         Button* increasWidthButton;
@@ -30,6 +39,7 @@ class Map{
 
         ofImage plusSign;
         ofImage minusSign;
+
         ofTrueTypeFont font;
 
 
@@ -46,9 +56,11 @@ class Map{
         void mouseTracking(int x, int y);
         void reset();
         void changeMapDimensions();
-        void drawMatrix();
+        void drawMatrix(vector<vector<int>>*);
         void setFruitInMatrix();
         void setSnakeInMatrix();
+        void BFStraversal();
+        void drawPaths();
 
         
 };

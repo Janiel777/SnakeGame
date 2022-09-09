@@ -11,7 +11,7 @@ private:
     int squareLength;
     int mapW;
     int mapH;
-    int numOfFruits = 20;
+    int numOfFruits = 3;
 public:
     FruitSpawner(EntityManager* em, int mapX, int mapY, int mapW, int mapH, int squareLength, vector<vector<int>>* matrix);
     void tick();

@@ -13,7 +13,7 @@ void Snake::render(){
 }
 
 void Snake::tick(){
-    counter++;
+    if(!stopMoving) counter++;
     if(counter == speed){
 
         for(int i = body.size()-1; i > 0; i--){

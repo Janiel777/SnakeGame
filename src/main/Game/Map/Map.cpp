@@ -51,6 +51,8 @@ Map::Map(int w, int h, int squaresLength){
         } 
     }
 
+    matrixCopy = new vector<vector<int>>(*matrix);
+
     
     fruitSpawner = new FruitSpawner(em, x, y, w, h, squaresLength, matrix);
     em->snake = new Snake(x + int(w/2) * squaresLength, y + int(h/2) * squaresLength, squaresLength, squaresLength);
@@ -58,21 +60,22 @@ Map::Map(int w, int h, int squaresLength){
 }
 
 void Map::tick(){
+
     if(ofGetWidth() != windowW || ofGetHeight() != windowH) updateEntitiesCoordinates();
     if(em->snake->remove)em->spawNewSnake(x,y,w,h,squaresLength);
     //calculacion de la ruta
     //cambiamos la cola a 0 (lugar vacio en la matrix)
     //luego se mueve la culebra
     //setiamos la culebra en la matrix
-    (*matrix)[(em->snake->body[em->snake->body.size()-1]->getY() - y) / squaresLength][(em->snake->body[em->snake->body.size()-1]->getX() - x) / squaresLength] = 0;
-    em->tick();
 
-    setSnakeInMatrix();
-    setFruitInMatrix();
-    fruitSpawner->tick();
-    
-    
-    
+    if(!searching){
+        (*matrix)[(em->snake->body[em->snake->body.size()-1]->getY() - y) / squaresLength][(em->snake->body[em->snake->body.size()-1]->getX() - x) / squaresLength] = 0;
+        em->tick();
+
+        setSnakeInMatrix();
+        setFruitInMatrix();
+        fruitSpawner->tick();
+    }
 
     if(showHud){
         increasWidthButton->tick();
@@ -107,14 +110,73 @@ void Map::tick(){
         }
     }
 
-    
+    if(searching) BFStraversal();
 }
 
 void Map::render(){
     em->render();
-    drawGrid();
+    
+    if(searching) drawPaths();
+    // drawGrid();
     if(showHud) drawHud();
-    drawMatrix();
+    
+}
+
+void Map::BFStraversal(){
+
+    //paths es una lista de listas de int - list< list<int> >
+    //en donde las listas que guardan integers van a guardar el 
+    //row en el front de la lista y el column en el back de la lista.
+    //van a ser solamente listas de 2 integers todas. Son para
+    //guardar los pares de coordenadas de la matrix.
+    if(paths.empty()){
+        int row = (em->snake->getY() - y) / squaresLength;
+        int column = (em->snake->getX() - x) / squaresLength;
+
+        if((*matrixCopy)[row+1][column] == 0){
+            paths.push_back(list<int>({row+1,column}));
+            (*matrixCopy)[row+1][column] = -1;
+        }
+        if((*matrixCopy)[row-1][column] == 0){
+            paths.push_back(list<int>({row-1,column}));
+            (*matrixCopy)[row-1][column] = -1;
+        }
+        if((*matrixCopy)[row][column+1] == 0){
+            paths.push_back(list<int>({row,column+1}));
+            (*matrixCopy)[row][column+1] = -1;
+        }
+        if((*matrixCopy)[row][column-1] == 0){
+            paths.push_back(list<int>({row,column-1}));
+            (*matrixCopy)[row][column-1] = -1;
+        }
+
+        (*matrixCopy)[row][column] = -1;
+
+    }else{
+
+        int row = paths.front().front();
+        int column = paths.front().back();
+
+        if((*matrixCopy)[row+1][column] == 0){
+            paths.push_back(list<int>({row+1,column}));
+            (*matrixCopy)[row+1][column] = -1;
+        }
+        if((*matrixCopy)[row-1][column] == 0){
+            paths.push_back(list<int>({row-1,column}));
+            (*matrixCopy)[row-1][column] = -1;
+        }
+        if((*matrixCopy)[row][column+1] == 0){
+            paths.push_back(list<int>({row,column+1}));
+            (*matrixCopy)[row][column+1] = -1;
+        }
+        if((*matrixCopy)[row][column-1] == 0){
+            paths.push_back(list<int>({row,column-1}));
+            (*matrixCopy)[row][column-1] = -1;
+        }
+
+        paths.pop_front();
+    }
+
 }
 
 /**
@@ -162,6 +224,13 @@ void Map::changeMapDimensions(){
 void Map::keyPressed(int key){
     em->keyPressed(key);
     if(key == ' ') showHud = !showHud;
+    if(key == '1'){
+        searching = !searching;
+        em->snake->setStopMoving(!em->snake->getStopMoving());
+        paths.clear();
+        matrixCopy->clear();
+        matrixCopy->insert(matrixCopy->begin(), matrix->begin(), matrix->end());
+    } 
 }
 
 void Map::mousePressed(int x, int y, int button){
@@ -217,14 +286,42 @@ void Map::drawGrid(){
     }
 }
 
-void Map::drawMatrix(){
+void Map::drawPaths(){
+    list<list<int>>::iterator it;
+    for (it = paths.begin(); it != paths.end(); ++it){
+        ofSetColor(0,0,0);
+        ofDrawRectangle(x + (*it).back() * squaresLength, y + (*it).front() * squaresLength, squaresLength, squaresLength);
+    }   
+    // ofDrawBitmapString(ofToString(paths.size()), 20,100);
+    // ofDrawBitmapString(ofToString(paths.back().front()) + " " +  ofToString(paths.back().back()), 20,120);
+}
+
+void Map::drawMatrix(vector<vector<int>>* m){
     ofSetColor(0,0,0);
-    for(int row = 0; row < (*matrix).size(); row++){
-        for(int column = 0; column < (*matrix)[row].size(); column++){
-            ofDrawBitmapString(ofToString((*matrix)[row][column]), x + column * squaresLength, y + row * squaresLength + squaresLength);
+    for(int row = 0; row < (*m).size(); row++){
+        for(int column = 0; column < (*m)[row].size(); column++){
+            ofDrawBitmapString(ofToString((*m)[row][column]), x + column * squaresLength, y + row * squaresLength + squaresLength);
         }
     }
-    ofDrawBitmapString(ofToString((*matrix).size()), 20,20);
+    ofDrawBitmapString(ofToString((*m).size()), 20,20);
+}
+
+
+void Map::drawHud(){
+    ofSetColor(255,255,255);
+    int stringWidth = font.stringWidth("Map Width      Map Height      Number of Fruits      Snake Speed");
+    font.drawString("Map Width      Map Height      Number of Fruits      Snake Speed", ofGetWidth()/2 - stringWidth/2, 20);
+    if(showHud){
+        increasWidthButton->render();
+        decreaseWidthButton->render();
+        increasHeightButton->render();
+        decreaseHeightButton->render();
+        increaseFuitsButton->render();
+        decreaseFuitsButton->render();
+        increasSnakeSpeedButton->render();
+        decreaseSnakeSpeedButton->render();
+    }
+    searching ? drawMatrix(matrixCopy) : drawMatrix(matrix);
 }
 
 void Map::setFruitInMatrix(){
@@ -247,21 +344,7 @@ void Map::setSnakeInMatrix(){
  * respective texts are drawn
  * 
  */
-void Map::drawHud(){
-    ofSetColor(255,255,255);
-    int stringWidth = font.stringWidth("Map Width      Map Height      Number of Fruits      Snake Speed");
-    font.drawString("Map Width      Map Height      Number of Fruits      Snake Speed", ofGetWidth()/2 - stringWidth/2, 20);
-    if(showHud){
-        increasWidthButton->render();
-        decreaseWidthButton->render();
-        increasHeightButton->render();
-        decreaseHeightButton->render();
-        increaseFuitsButton->render();
-        decreaseFuitsButton->render();
-        increasSnakeSpeedButton->render();
-        decreaseSnakeSpeedButton->render();
-    }
-}
+
 
 
 /**

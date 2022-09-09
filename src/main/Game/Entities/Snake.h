@@ -18,7 +18,8 @@ class Snake : public Entity{
         
         MOVING moving = RIGHT;
         int counter = 0;
-        int speed = 6;
+        int speed = 16;
+        bool stopMoving = false;
     public:
         vector<ofRectangle*> body;
         Snake(int x, int y, int w, int h);
@@ -30,5 +31,7 @@ class Snake : public Entity{
         void updateCoordinates(int oldMapX, int oldMapY, int mapX, int mapY);
         int getSpeed(){return speed;}
         void setSpeed(int num){speed = num; counter = 0;}
+        bool getStopMoving(){return stopMoving;}
+        void setStopMoving(bool b){stopMoving = b; counter = 0;}
         
 };

@@ -25,7 +25,8 @@
 			"new": "cpp",
 			"memory": "cpp",
 			"random": "cpp",
-			"optional": "cpp"
+			"optional": "cpp",
+			"tuple": "cpp"
 		}
 	}
 }
