@@ -321,7 +321,7 @@ void Map::drawHud(){
         increasSnakeSpeedButton->render();
         decreaseSnakeSpeedButton->render();
     }
-    searching ? drawMatrix(matrixCopy) : drawMatrix(matrix);
+    //searching ? drawMatrix(matrixCopy) : drawMatrix(matrix);
 }
 
 void Map::setFruitInMatrix(){
