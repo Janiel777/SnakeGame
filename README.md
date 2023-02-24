@@ -10,8 +10,7 @@ The game is highly customizable, as parameters such as the speed of the snake, t
 Have fun playing Snake and customizing the game your way!
 
 ## Gameplay
-
-
+https://user-images.githubusercontent.com/95184925/221172623-23b5e775-a28e-49c3-b4c2-570a80e1584e.mp4
 
 
 
